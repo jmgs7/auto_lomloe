@@ -110,7 +110,7 @@ def main():
     dict_comp, dict_desc, dict_crit = preparar_mapeo(args.mapping)
     
 # --- Paso 4: Leer archivo de entrada ---
-    df = pd.read_excel(args.input, dtype=str)
+    df = pd.read_excel(args.input, dtype=str, index_col="Nº carta")
     if "Saberes básicos" not in df.columns:
         raise KeyError(
             "El archivo de entrada debe tener una columna llamada 'Saberes básicos'."
@@ -128,7 +128,7 @@ def main():
     output_path = f"{base}_filled{ext}"
 
     # Guardar resultado
-    df.to_excel(output_path, index=False)
+    df.to_excel(output_path, index=True)
     print(f"Archivo generado: {output_path}")
 
 
