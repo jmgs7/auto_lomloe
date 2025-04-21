@@ -65,7 +65,7 @@ def preparar_mapeo(mapping_path, sheet_name="Esquema elementos currículo"):
 
     return dict_competencias, dict_descriptores, dict_criterios
 
-
+# --- Paso 3: Función para rellenar campos considerando múltiples asociaciones ---
 def rellenar_campos(saberes_str, dict_competencias, dict_descriptores, dict_criterios):
     if pd.isna(saberes_str):
         return "", "", ""
@@ -108,15 +108,15 @@ def main():
 
     # Preparar mapeo
     dict_comp, dict_desc, dict_crit = preparar_mapeo(args.mapping)
-
-    # Leer input
+    
+# --- Paso 4: Leer archivo de entrada ---
     df = pd.read_excel(args.input, dtype=str)
     if "Saberes básicos" not in df.columns:
         raise KeyError(
             "El archivo de entrada debe tener una columna llamada 'Saberes básicos'."
         )
 
-    # Aplicar relleno
+# --- Paso 5: Aplicar función y generar columnas nuevas ---
     df[
         ["Competencias específicas", "Descriptores del perfil de salida", "Criterios de evaluación"]
     ] = df["Saberes básicos"].apply(
