@@ -104,13 +104,20 @@ def main():
         required=True,
         help="Excel incompleto con columnas 'Nº actividad' y 'Saberes básicos'.",
     )
+    parser.add_argument(
+        "--index",
+        required=False,
+        help="Nombre de la columna que se usará como índice (por defecto: 'Nº carta').",
+        default="Nº carta",
+    )
     args = parser.parse_args()
 
     # Preparar mapeo
     dict_comp, dict_desc, dict_crit = preparar_mapeo(args.mapping)
     
 # --- Paso 4: Leer archivo de entrada ---
-    df = pd.read_excel(args.input, dtype=str, index_col="Nº carta")
+    df = pd.read_excel(args.input, dtype=str, index_col=args.index)
+    # Verificar que la columna "Saberes básicos" existe
     if "Saberes básicos" not in df.columns:
         raise KeyError(
             "El archivo de entrada debe tener una columna llamada 'Saberes básicos'."
