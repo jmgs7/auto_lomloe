@@ -65,6 +65,7 @@ def preparar_mapeo(mapping_path, sheet_name="Esquema elementos currículo"):
 
     return dict_competencias, dict_descriptores, dict_criterios
 
+
 # --- Paso 3: Función para rellenar campos considerando múltiples asociaciones ---
 def rellenar_campos(saberes_str, dict_competencias, dict_descriptores, dict_criterios):
     if pd.isna(saberes_str):
@@ -100,9 +101,21 @@ def main():
         help="Excel de mapeo curricular (con hoja 'Descripción elementos del currí').",
     )
     parser.add_argument(
+        "--mapping_sheet",
+        required=False,
+        help="Nombre de la hoja del archivo de mapeo (por defecto: 'Esquema elementos currículo').",
+        default="Esquema elementos currículo",
+    )
+    parser.add_argument(
         "--input",
         required=True,
         help="Excel incompleto con columnas 'Nº actividad' y 'Saberes básicos'.",
+    )
+    parser.add_argument(
+        "--input_sheet",
+        required=False,
+        help="Nombre de la hoja del archivo de entrada (por defecto: 'Hoja1').",
+        default="Hoja1",
     )
     parser.add_argument(
         "--index",
@@ -113,19 +126,25 @@ def main():
     args = parser.parse_args()
 
     # Preparar mapeo
-    dict_comp, dict_desc, dict_crit = preparar_mapeo(args.mapping)
-    
-# --- Paso 4: Leer archivo de entrada ---
-    df = pd.read_excel(args.input, dtype=str, index_col=args.index)
+    dict_comp, dict_desc, dict_crit = preparar_mapeo(args.mapping, args.mapping_sheet)
+
+    # --- Paso 4: Leer archivo de entrada ---
+    df = pd.read_excel(
+        args.input, dtype=str, sheet_name=args.input_sheet, index_col=args.index
+    )
     # Verificar que la columna "Saberes básicos" existe
     if "Saberes básicos" not in df.columns:
         raise KeyError(
             "El archivo de entrada debe tener una columna llamada 'Saberes básicos'."
         )
 
-# --- Paso 5: Aplicar función y generar columnas nuevas ---
+    # --- Paso 5: Aplicar función y generar columnas nuevas ---
     df[
-        ["Competencias específicas", "Descriptores del perfil de salida", "Criterios de evaluación"]
+        [
+            "Competencias específicas",
+            "Descriptores del perfil de salida",
+            "Criterios de evaluación",
+        ]
     ] = df["Saberes básicos"].apply(
         lambda s: pd.Series(rellenar_campos(s, dict_comp, dict_desc, dict_crit))
     )
